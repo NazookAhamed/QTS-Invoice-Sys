@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Queens Tech Solutions — Invoice</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #141417;
+    --card: #1a1a1f;
+    --border: #2a2a32;
+    --accent: #f5c542;
+    --accent2: #ff6b35;
+    --text: #f0eff4;
+    --muted: #6b6b7e;
+    --success: #4ade80;
+    --wa: #25D366;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(245,197,66,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(245,197,66,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .qr img {
+    max-height: 140px;
+    max-width: 140px;
+    object-fit: contain;
+  }
+
+  .brand { display: flex; flex-direction: column; gap: 0.3rem; }
+
+  .brand-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .brand-name span { color: var(--accent); }
+
+  .invoice-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+  }
+
+  .invoice-badge .label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .invoice-badge .doc-type {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 0.3rem 0.8rem;
+    letter-spacing: 0.1em;
+  }
+
+  .section { margin-bottom: 2rem; animation: fadeUp 0.5s ease both; }
+  .section:nth-child(2) { animation-delay: 0.1s; }
+  .section:nth-child(3) { animation-delay: 0.2s; }
+  .section:nth-child(4) { animation-delay: 0.3s; }
+  .section:nth-child(5) { animation-delay: 0.4s; }
+
+  .section-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.2rem; }
+
+  .section-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    background: rgba(245,197,66,0.1);
+    border: 1px solid rgba(245,197,66,0.3);
+    padding: 0.2rem 0.5rem;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .card { background: var(--card); border: 1px solid var(--border); padding: 1.5rem; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.2rem; }
+  .span-2 { grid-column: span 2; }
+
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .field label {
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .field input, .field select, .field textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    padding: 0.65rem 0.85rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(245,197,66,0.12);
+  }
+
+  .field input::placeholder, .field textarea::placeholder { color: #3a3a48; }
+
+  .field select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b7e' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    padding-right: 2.5rem;
+  }
+
+  .field select option { background: var(--card); color: var(--text); }
+  .field textarea { resize: vertical; min-height: 80px; }
+
+  .type-group { display: flex; gap: 0; border: 1px solid var(--border); }
+  .type-option { display: none; }
+
+  .type-label {
+    flex: 1;
+    text-align: center;
+    padding: 0.65rem 0.5rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--muted);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    transition: all 0.2s;
+    font-family: 'DM Mono', monospace;
+    font-weight: 500;
+  }
+
+  .type-label:last-of-type { border-right: none; }
+  .type-label:hover { color: var(--text); background: rgba(245,197,66,0.06); }
+
+  .type-option:checked + .type-label {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 500;
+  }
+
+  .items-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 36px;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: rgba(245,197,66,0.07);
+    border: 1px solid var(--border);
+    border-bottom: none;
+  }
+
+  .items-header span {
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .item-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 36px;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: none;
+    animation: slideIn 0.2s ease both;
+  }
+
+  .item-row input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    padding: 0.5rem 0.6rem;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+  }
+
+  .item-row input:focus { border-color: var(--accent); }
+  .item-row input[type=number] { -moz-appearance: textfield; }
+  .item-row input[type=number]::-webkit-outer-spin-button,
+  .item-row input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .remove-btn {
+    width: 36px; height: 36px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-family: monospace;
+  }
+
+  .remove-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  /* Preset Items Dropdown */
+  .preset-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .preset-bar select {
+    background: var(--surface);
+    border: 1px solid rgba(245,197,66,0.3);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    padding: 0.45rem 2rem 0.45rem 0.7rem;
+    cursor: pointer;
+    outline: none;
+    flex: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' viewBox='0 0 12 7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23f5c542' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    -webkit-appearance: none;
+    transition: border-color 0.2s;
+  }
+
+  .preset-bar select:focus { border-color: var(--accent); }
+  .preset-bar select option { background: var(--card); color: var(--text); }
+
+  .preset-add-btn {
+    background: rgba(245,197,66,0.1);
+    border: 1px solid rgba(245,197,66,0.3);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    padding: 0.45rem 0.8rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .preset-add-btn:hover { background: rgba(245,197,66,0.18); }
+
+  .add-row-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px dashed rgba(245,197,66,0.3);
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    width: 100%;
+    margin-top: -1px;
+    transition: all 0.2s;
+  }
+
+  .add-row-btn:hover { background: rgba(245,197,66,0.05); border-style: solid; }
+
+  .totals {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .total-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; }
+  .total-row .tl { color: var(--muted); }
+
+  .total-row input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.82rem;
+    padding: 0.4rem 0.7rem;
+    outline: none;
+    width: 140px;
+    text-align: right;
+    transition: border-color 0.2s;
+  }
+
+  .total-row input:focus { border-color: var(--accent); }
+  .total-row input[readonly] { opacity: 0.6; cursor: default; }
+
+  .total-divider { border: none; border-top: 1px solid var(--border); margin: 0.3rem 0; }
+
+  .grand-total { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; }
+  .grand-total .tl { color: var(--accent); }
+  .grand-total .tv { color: var(--accent); font-size: 1.1rem; }
+
+  /* PAID stamp */
+  .paid-stamp {
+    display: none;
+    align-self: flex-end;
+    border: 3px solid var(--success);
+    color: var(--success);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    padding: 0.3rem 0.8rem;
+    transform: rotate(-4deg);
+    opacity: 0.85;
+    margin-top: 0.5rem;
+  }
+
+  .check-group { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .check-item { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; }
+  .check-item input[type=checkbox] { display: none; }
+
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .check-item input:checked + .check-box { background: var(--accent); border-color: var(--accent); }
+  .check-item input:checked + .check-box::after { content: '✓'; font-size: 0.7rem; color: var(--bg); font-weight: 700; }
+  .check-item span { font-size: 0.75rem; color: var(--text); letter-spacing: 0.05em; }
+
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+    animation: fadeUp 0.5s 0.5s ease both;
+  }
+
+  .btn-primary {
+    flex: 1;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 1rem 1.5rem;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover { background: #f0d060; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(245,197,66,0.25); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 1rem 1.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-secondary:hover { color: var(--text); border-color: var(--text); }
+
+  .btn-pdf {
+    background: transparent;
+    color: var(--accent2);
+    border: 1px solid var(--accent2);
+    padding: 1rem 1.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .btn-pdf:hover { background: rgba(255,107,53,0.08); box-shadow: 0 0 16px rgba(255,107,53,0.2); }
+
+  .btn-wa {
+    background: transparent;
+    color: var(--wa);
+    border: 1px solid var(--wa);
+    padding: 1rem 1.2rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .btn-wa:hover { background: rgba(37,211,102,0.08); box-shadow: 0 0 16px rgba(37,211,102,0.15); }
+
+  .toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: var(--success);
+    color: var(--bg);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    padding: 0.8rem 1.5rem;
+    transform: translateY(4rem);
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+
+  @media (max-width: 640px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .span-2 { grid-column: span 1; }
+    .header { flex-direction: column; gap: 1rem; }
+    .invoice-badge { align-items: flex-start; }
+    .items-header { grid-template-columns: 2fr 0.8fr 0.8fr 32px; }
+    .item-row { grid-template-columns: 2fr 0.8fr 0.8fr 32px; }
+    .brand-name { font-size: 1.4rem; }
+    .actions { flex-direction: column; }
+    .btn-primary, .btn-secondary, .btn-pdf, .btn-wa { justify-content: center; }
+  }
+
+  /* ─── PRINT / PDF STYLES ─────────────────────────────────── */
+  @media print {
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+    body {
+      background: #ffffff !important;
+      color: #111111 !important;
+      font-family: 'DM Mono', 'Courier New', monospace;
+      padding: 0; margin: 0;
+    }
+
+    body::before { display: none !important; }
+    .container { max-width: 100%; padding: 0; }
+    .actions, .add-row-btn, .remove-btn, .preset-bar { display: none !important; }
+
+    .header {
+      border-bottom: 2px solid #111 !important;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      animation: none !important;
+    }
+
+    .brand-tag { color: #888 !important; }
+    .brand-name { color: #111 !important; font-size: 1.6rem !important; }
+    .brand-name span { color: #c8a000 !important; }
+    .invoice-badge .label { color: #888 !important; }
+    .invoice-badge .doc-type { color: #c84000 !important; border-color: #c84000 !important; font-size: 1rem !important; }
+
+    .section { animation: none !important; margin-bottom: 1.2rem; }
+
+    .section-num { background: #f5f0d8 !important; border-color: #c8a000 !important; color: #8a6e00 !important; }
+    .section-title { color: #555 !important; }
+
+    .card { background: #fafafa !important; border: 1px solid #ccc !important; padding: 1rem !important; }
+    .field label { color: #888 !important; }
+
+    .field input, .field select, .field textarea {
+      background: transparent !important; border: none !important;
+      border-bottom: 1px solid #ccc !important; color: #111 !important;
+      padding: 0.3rem 0 !important; font-size: 0.85rem !important;
+    }
+
+    .type-group { border: none !important; }
+    .type-label { display: none !important; }
+    .type-option:checked + .type-label {
+      display: block !important; background: #f5f0d8 !important;
+      color: #8a6e00 !important; border: 1px solid #c8a000 !important;
+      padding: 0.3rem 0.8rem !important; font-size: 0.75rem !important;
+      width: auto !important; flex: unset !important;
+    }
+
+    .items-header { background: #f5f0d8 !important; border-color: #ccc !important; }
+    .items-header span { color: #8a6e00 !important; }
+
+    .item-row { background: #fff !important; border-color: #ddd !important; animation: none !important; }
+    .item-row input {
+      background: transparent !important; border: none !important;
+      border-bottom: 1px solid #e0e0e0 !important; color: #111 !important;
+      font-size: 0.8rem !important; padding: 0.3rem 0 !important;
+    }
+
+    .totals { background: #fafafa !important; border: 1px solid #ccc !important; }
+    .total-row .tl { color: #555 !important; }
+    .total-row input { background: transparent !important; border: none !important; border-bottom: 1px solid #ccc !important; color: #111 !important; }
+    .total-divider { border-top-color: #ccc !important; }
+    .grand-total .tl, .grand-total .tv { color: #8a6e00 !important; }
+
+    .check-box { background: #fff !important; border-color: #aaa !important; }
+    .check-item input:checked + .check-box { background: #c8a000 !important; border-color: #c8a000 !important; }
+    .check-item span { color: #111 !important; }
+
+    .total-row select {
+      background: transparent !important; border: none !important;
+      border-bottom: 1px solid #ccc !important; color: #111 !important;
+      font-family: 'DM Mono', monospace !important; font-size: 0.82rem !important; padding: 0.2rem 0 !important;
+    }
+
+    /* PAID stamp shows on print */
+    .paid-stamp { display: block !important; border-color: #2a9c55 !important; color: #2a9c55 !important; }
+
+    .print-footer {
+      display: block !important;
+      margin-top: 2rem; padding-top: 1rem;
+      border-top: 1px solid #ccc;
+      text-align: center;
+      font-size: 0.65rem; color: #aaa; letter-spacing: 0.1em;
+    }
+
+    @page { size: A4; margin: 14mm 16mm 14mm 16mm; }
+    .section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="brand">
+      <span class="brand-tag">Invoice System</span>
+      <div class="brand-name">Queens<span>Tech</span></div>
+      <div class="brand-name" style="font-size:1rem; font-weight:400; color:var(--muted); letter-spacing:0.05em; margin-top:2px;">Solutions</div>
+      <div class="brand-name" style="font-size:1rem; font-weight:400; color:var(--muted); letter-spacing:0.05em; margin-top:2px;">157/C Sea Street Negombo</div>
+      <div class="brand-name" style="font-size:1rem; font-weight:400; color:var(--muted); letter-spacing:0.05em; margin-top:2px;">077 533 6325 &nbsp;||&nbsp; 077 800 9537</div>
+    </div>
+    <div class="qr">
+      <img src="qr.png" onerror="this.style.display='none'" alt="QR Code">
+    </div>
+    <div class="invoice-badge">
+      <span class="label">Document</span>
+      <div class="doc-type" id="doc-type-display">INVOICE</div>
+      <div style="font-size:0.65rem; color:var(--muted); margin-top:0.3rem;" id="current-date"></div>
+    </div>
+  </div>
+
+  <!-- Section 1: Customer Info -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <span class="section-title">Customer Information</span>
+    </div>
+    <div class="card">
+      <div class="grid-2">
+        <div class="field">
+          <label>Customer Name</label>
+          <input type="text" id="customer-name" placeholder="Full name">
+        </div>
+        <div class="field">
+          <label>Contact Number</label>
+          <input type="tel" id="contact-number" placeholder="+94 XX XXX XXXX">
+        </div>
+        <div class="field span-2">
+          <label>Address</label>
+          <textarea id="address" placeholder="Street, City, Province" rows="2"></textarea>
+        </div>
+        <div class="field">
+          <label>NIC Number</label>
+          <input type="text" id="nic" placeholder="XXXXXXXXV or XXXXXXXXXXXX">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Invoice Details -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <span class="section-title">Invoice Details</span>
+    </div>
+    <div class="card">
+      <div class="grid-3">
+        <div class="field">
+          <label>Invoice Number</label>
+          <input type="text" id="invoice-number" placeholder="QTS-YYMMDD-HHMM">
+        </div>
+        <div class="field">
+          <label>Invoice Date</label>
+          <input type="date" id="invoice-date">
+        </div>
+        <div class="field">
+          <label>Delivered Date</label>
+          <input type="date" id="delivered-date">
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Document Type</label>
+          <div class="type-group">
+            <input type="radio" name="doc-type" id="type-sales" class="type-option" value="Sales" checked>
+            <label for="type-sales" class="type-label">Sales</label>
+            <input type="radio" name="doc-type" id="type-service" class="type-option" value="Service">
+            <label for="type-service" class="type-label">Service</label>
+            <input type="radio" name="doc-type" id="type-receipt" class="type-option" value="Receipt">
+            <label for="type-receipt" class="type-label">Receipt</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Items -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <span class="section-title">Items / Services</span>
+    </div>
+
+    <!-- Preset quick-add bar -->
+    <div class="preset-bar">
+      <select id="preset-select">
+        <option value="">⚡ Quick Add — Common Services</option>
+        <optgroup label="Screen Repairs">
+          <option value="Screen Replacement (Original)|1 unit|0">Screen Replacement (Original)</option>
+          <option value="Screen Replacement (Copy)|1 unit|0">Screen Replacement (Copy)</option>
+          <option value="LCD Digitizer Replacement|1 unit|0">LCD Digitizer Replacement</option>
+        </optgroup>
+        <optgroup label="Battery & Charging">
+          <option value="Battery Replacement|1 unit|0">Battery Replacement</option>
+          <option value="Charging Port Repair|1 job|0">Charging Port Repair</option>
+          <option value="Charging IC Repair|1 job|0">Charging IC Repair</option>
+        </optgroup>
+        <optgroup label="Software">
+          <option value="Software Flash / OS Reinstall|1 job|0">Software Flash / OS Reinstall</option>
+          <option value="Unlock / Bypass|1 job|0">Unlock / Bypass</option>
+          <option value="Data Backup & Restore|1 job|0">Data Backup &amp; Restore</option>
+          <option value="Virus / Malware Removal|1 job|0">Virus / Malware Removal</option>
+        </optgroup>
+        <optgroup label="Hardware">
+          <option value="Camera Repair / Replacement|1 unit|0">Camera Repair / Replacement</option>
+          <option value="Speaker / Mic Repair|1 job|0">Speaker / Mic Repair</option>
+          <option value="Back Glass Replacement|1 unit|0">Back Glass Replacement</option>
+          <option value="Water Damage Service|1 job|0">Water Damage Service</option>
+          <option value="Motherboard Repair|1 job|0">Motherboard Repair</option>
+        </optgroup>
+        <optgroup label="Accessories / Sales">
+          <option value="Screen Protector (Tempered)|1 unit|0">Screen Protector (Tempered)</option>
+          <option value="Phone Case / Cover|1 unit|0">Phone Case / Cover</option>
+          <option value="USB Cable|1 unit|0">USB Cable</option>
+          <option value="Charger Adapter|1 unit|0">Charger Adapter</option>
+        </optgroup>
+      </select>
+      <button class="preset-add-btn" onclick="addPresetItem()">+ Add</button>
+    </div>
+
+    <div class="items-header">
+      <span>Item / Model / Brand / Device — Fault / Service / Description</span>
+      <span>Qty / Spec</span>
+      <span>LKR</span>
+      <span></span>
+    </div>
+
+    <div id="items-container"></div>
+
+    <button class="add-row-btn" onclick="addItem()">
+      <span>+</span> Add Item Row
+    </button>
+
+    <div class="totals" style="margin-top:1rem;">
+      <div class="total-row">
+        <span class="tl">Subtotal</span>
+        <input type="text" id="subtotal" readonly placeholder="0.00">
+      </div>
+      <div class="total-row">
+        <span class="tl">Discount (LKR)</span>
+        <input type="number" id="discount" placeholder="0.00" oninput="calcTotals()">
+      </div>
+      <hr class="total-divider">
+      <div class="total-row grand-total">
+        <span class="tl">Total Amount</span>
+        <span class="tv" id="total-display">LKR 0.00</span>
+      </div>
+      <hr class="total-divider">
+      <div class="total-row">
+        <span class="tl">Payment Method</span>
+        <select id="payment-method" style="width:140px; background:var(--surface); border:1px solid var(--border); color:var(--text); font-family:'DM Mono',monospace; font-size:0.82rem; padding:0.4rem 0.6rem; outline:none; cursor:pointer;">
+          <option value="">Select</option>
+          <option>Cash</option>
+          <option>Card</option>
+          <option>Bank Transfer</option>
+          <option>Online</option>
+        </select>
+      </div>
+      <div class="total-row">
+        <span class="tl">Paid Amount (LKR)</span>
+        <input type="number" id="paid-amount" placeholder="0.00" oninput="calcBalance()">
+      </div>
+      <div class="total-row">
+        <span class="tl">Balance</span>
+        <input type="text" id="balance" readonly placeholder="0.00">
+      </div>
+      <!-- PAID stamp — shows when balance is 0 and paid > 0 -->
+      <div class="paid-stamp" id="paid-stamp">✓ RECEIVED</div>
+    </div>
+  </div>
+
+  <!-- Section 4: Warranty -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <span class="section-title">Warranty &amp; Coverage</span>
+    </div>
+    <div class="card">
+      <div class="grid-2">
+        <div class="field">
+          <label>Warranty Applies To</label>
+          <div class="check-group" style="margin-top:0.4rem">
+            <label class="check-item">
+              <input type="checkbox" id="w-sales">
+              <div class="check-box"></div>
+              <span>Sales</span>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" id="w-service">
+              <div class="check-box"></div>
+              <span>Service</span>
+            </label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Coverage / Responsible Party</label>
+          <input type="text" id="warranty-coverage" placeholder="e.g. Manufacturer, In-store">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: Notes -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <span class="section-title">Additional Notes</span>
+    </div>
+    <div class="card">
+      <div class="field">
+        <label>Notes / Remarks</label>
+        <textarea id="notes" placeholder="Any special instructions or observations..." rows="3"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print footer -->
+  <div class="print-footer" style="display:none;">
+    Queens Tech Solutions · Generated on <span id="print-date"></span>
+    · This is a computer-generated document.
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn-secondary" onclick="clearForm()">Clear Form</button>
+    <button class="btn-pdf" onclick="generatePDF()">
+      <svg width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 1H2C1.4 1 1 1.4 1 2v12c0 .6.4 1 1 1h10c.6 0 1-.4 1-1V6L8 1z" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M8 1v5h5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M4 9h6M4 11.5h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Print / PDF
+    </button>
+    <button class="btn-wa" onclick="sendWhatsApp()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      WhatsApp
+    </button>
+    <button class="btn-primary" onclick="generateSummary()">Copy Summary</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">✓ Done</div>
+
+<script>
+  // ── Generate datetime-based invoice number ──────────────────
+  // Format: QTS-YYMMDD-HHMM  e.g. QTS-260415-1423
+  function generateInvoiceNumber() {
+    const now = new Date();
+    const yy  = String(now.getFullYear()).slice(2);
+    const mm  = String(now.getMonth() + 1).padStart(2, '0');
+    const dd  = String(now.getDate()).padStart(2, '0');
+    const hh  = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    return `QTS-${yy}${mm}${dd}-${hh}${min}`;
+  }
+
+  // ── Date display setup ──────────────────────────────────────
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+  document.getElementById('current-date').textContent = dateStr;
+  document.getElementById('print-date').textContent = dateStr;
+
+  // ── Doc type radio listener ─────────────────────────────────
+  document.querySelectorAll('input[name="doc-type"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('doc-type-display').textContent = r.value.toUpperCase();
+    });
+  });
+
+  // ── Item counter ────────────────────────────────────────────
+  let itemCount = 0;
+
+  function addItem(desc, qty, price) {
+    itemCount++;
+    const id = itemCount;
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    div.id = `item-${id}`;
+    div.innerHTML = `
+      <input type="text" placeholder="Item description / service details" data-id="${id}" class="item-desc" value="${desc || ''}">
+      <input type="text" placeholder="1 unit" data-id="${id}" class="item-qty" value="${qty || ''}">
+      <input type="number" placeholder="0.00" data-id="${id}" class="item-price" oninput="calcTotals();" value="${price || ''}">
+      <button class="remove-btn" onclick="removeItem(${id})">×</button>
+    `;
+    document.getElementById('items-container').appendChild(div);
+    if (!desc) div.querySelector('.item-desc').focus();
+    calcTotals();
+  }
+
+  function addPresetItem() {
+    const sel = document.getElementById('preset-select');
+    const val = sel.value;
+    if (!val) return;
+    const parts = val.split('|');
+    addItem(parts[0], parts[1], parts[2]);
+    sel.value = '';
+  }
+
+  function removeItem(id) {
+    const el = document.getElementById(`item-${id}`);
+    if (el) el.remove();
+    calcTotals();
+  }
+
+  function calcTotals() {
+    let sub = 0;
+    document.querySelectorAll('.item-row').forEach(row => {
+      let qty = parseFloat(row.querySelector('.item-qty').value);
+      if (isNaN(qty)) qty = 1;
+      let price = parseFloat(row.querySelector('.item-price').value) || 0;
+      sub += qty * price;
+    });
+    document.getElementById('subtotal').value = sub.toFixed(2);
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const total = Math.max(0, sub - discount);
+    document.getElementById('total-display').textContent =
+      'LKR ' + total.toLocaleString('en-LK', {minimumFractionDigits: 2});
+    calcBalance();
+  }
+
+  function calcBalance() {
+    const sub = parseFloat(document.getElementById('subtotal').value) || 0;
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const total = Math.max(0, sub - discount);
+    const paid = parseFloat(document.getElementById('paid-amount').value) || 0;
+    const bal = total - paid;
+    document.getElementById('balance').value = bal.toFixed(2);
+    const stamp = document.getElementById('paid-stamp');
+    stamp.style.display = (paid > 0 && bal <= 0) ? 'block' : 'none';
+  }
+
+  // ── Print / PDF ─────────────────────────────────────────────
+  function generatePDF() {
+    document.querySelector('.print-footer').style.display = 'block';
+    window.print();
+    setTimeout(() => { document.querySelector('.print-footer').style.display = 'none'; }, 1000);
+  }
+
+  // ── Clear form — also resets to a fresh invoice number ──────
+  function clearForm() {
+    if (!confirm('Clear all fields and start a new invoice?')) return;
+    document.querySelectorAll('input:not([type=radio]):not([type=checkbox]), textarea, select')
+      .forEach(el => { el.value = ''; });
+    document.getElementById('items-container').innerHTML = '';
+    document.getElementById('total-display').textContent = 'LKR 0.00';
+    document.getElementById('doc-type-display').textContent = 'INVOICE';
+    document.getElementById('type-sales').checked = true;
+    document.getElementById('paid-stamp').style.display = 'none';
+    itemCount = 0;
+    // Fresh invoice number & date
+    document.getElementById('invoice-number').value = generateInvoiceNumber();
+    document.getElementById('invoice-date').value = new Date().toISOString().split('T')[0];
+    addItem();
+    showToast('✓ Form cleared');
+  }
+
+  // ── WhatsApp ────────────────────────────────────────────────
+  function sendWhatsApp() {
+    const name      = document.getElementById('customer-name').value || '—';
+    const contact   = document.getElementById('contact-number').value || '';
+    const invNo     = document.getElementById('invoice-number').value || '—';
+    const invDate   = document.getElementById('invoice-date').value || '—';
+    const docType   = document.querySelector('input[name="doc-type"]:checked').value;
+    const total     = document.getElementById('total-display').textContent;
+    const balance   = document.getElementById('balance').value || '0.00';
+    const paid      = document.getElementById('paid-amount').value || '0.00';
+    const payMethod = document.getElementById('payment-method').value || '—';
+    const notes     = document.getElementById('notes').value;
+    const warranty  = document.getElementById('warranty-coverage').value;
+
+    let itemsText = '';
+    document.querySelectorAll('.item-row').forEach((row, i) => {
+      const desc  = row.querySelector('.item-desc').value || '—';
+      const qty   = row.querySelector('.item-qty').value || '1';
+      const price = row.querySelector('.item-price').value || '0.00';
+      itemsText += `  ${i + 1}. ${desc} (${qty}) — LKR ${parseFloat(price).toLocaleString('en-LK')}\n`;
+    });
+
+    const balNum     = parseFloat(balance);
+    const paidStatus = balNum <= 0 ? '✅ FULLY PAID' : `⏳ Balance: LKR ${parseFloat(balance).toLocaleString('en-LK')}`;
+
+    let msg = `*🔧 Queens Tech Solutions*\n`;
+    msg += `*${docType.toUpperCase()} #${invNo}*\n`;
+    msg += `📅 ${invDate}\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `*Customer:* ${name}\n`;
+    if (contact) msg += `*Contact:* ${contact}\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `*Items:*\n${itemsText}`;
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `*${total}*\n`;
+    msg += `Paid: LKR ${parseFloat(paid).toLocaleString('en-LK')} (${payMethod})\n`;
+    msg += `${paidStatus}\n`;
+    if (warranty) msg += `🛡 Warranty: ${warranty}\n`;
+    if (notes)    msg += `📝 ${notes}\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `Thank you for choosing Queens Tech! 🙏\n`;
+    msg += `📍 157/C Sea Street, Negombo\n`;
+    msg += `📞 077 533 6325`;
+
+    const encoded    = encodeURIComponent(msg);
+    const cleanContact = contact.replace(/[\s\-\+\(\)]/g, '');
+    const waNumber   = cleanContact.startsWith('0') ? '94' + cleanContact.slice(1) : cleanContact;
+    const url        = (waNumber.length >= 10)
+      ? `https://wa.me/${waNumber}?text=${encoded}`
+      : `https://wa.me/?text=${encoded}`;
+    window.open(url, '_blank');
+  }
+
+  // ── Copy text summary ───────────────────────────────────────
+  function generateSummary() {
+    const name      = document.getElementById('customer-name').value || '—';
+    const contact   = document.getElementById('contact-number').value || '—';
+    const address   = document.getElementById('address').value || '—';
+    const nic       = document.getElementById('nic').value || '—';
+    const invNo     = document.getElementById('invoice-number').value || '—';
+    const invDate   = document.getElementById('invoice-date').value || '—';
+    const delDate   = document.getElementById('delivered-date').value || '—';
+    const docType   = document.querySelector('input[name="doc-type"]:checked').value;
+    const payMethod = document.getElementById('payment-method').value || '—';
+    const paid      = document.getElementById('paid-amount').value || '0.00';
+    const balance   = document.getElementById('balance').value || '0.00';
+    const total     = document.getElementById('total-display').textContent;
+    const notes     = document.getElementById('notes').value || '—';
+
+    let itemsText = '';
+    document.querySelectorAll('.item-row').forEach((row, i) => {
+      const desc  = row.querySelector('.item-desc').value || '—';
+      const qty   = row.querySelector('.item-qty').value || '—';
+      const price = row.querySelector('.item-price').value || '0.00';
+      itemsText += `  ${i+1}. ${desc} | ${qty} | LKR ${price}\n`;
+    });
+    if (!itemsText) itemsText = '  (no items added)\n';
+
+    const summary = `QUEENS TECH SOLUTIONS — ${docType.toUpperCase()}
+${'='.repeat(50)}
+Invoice #: ${invNo}
+Date: ${invDate}    Delivered: ${delDate}
+
+CUSTOMER
+  Name:    ${name}
+  Contact: ${contact}
+  Address: ${address}
+  NIC:     ${nic}
+
+ITEMS
+${itemsText}
+TOTALS
+  ${total}
+  Discount: LKR ${document.getElementById('discount').value || '0'}
+  Payment:  ${payMethod}
+  Paid:     LKR ${paid}
+  Balance:  LKR ${balance}
+
+NOTES
+  ${notes}
+${'='.repeat(50)}
+Queens Tech Solutions · 157/C Sea Street, Negombo`;
+
+    navigator.clipboard.writeText(summary).catch(() => {});
+    showToast('✓ Summary copied to clipboard');
+  }
+
+  // ── Toast ───────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  // ── Init — always fresh, no localStorage restore ────────────
+  (function init() {
+    document.getElementById('invoice-number').value = generateInvoiceNumber();
+    document.getElementById('invoice-date').value = new Date().toISOString().split('T')[0];
+    addItem();
+    document.getElementById('customer-name').focus();
+  })();
+</script>
+</body>
+</html>
